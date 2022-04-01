@@ -1,0 +1,6 @@
+hikari==2.0.0.dev106
+PyYAML~=6.0
+hikari-lightbulb
+hikari-miru
+
+XlsxWriter~=3.0.2
