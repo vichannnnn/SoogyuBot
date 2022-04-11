@@ -4,8 +4,9 @@ import hikari
 import lightbulb
 import random
 from PrefixDatabase import PrefixDatabase, prefix_dictionary
-from components.class_component import Card, User, Inventory, Currency, Role
+from components.class_component import Card, User, Inventory, Currency, Role, inventory_list
 from Database import Database
+
 
 plugin = lightbulb.Plugin("Admin Commands")
 plugin.add_checks(lightbulb.checks.has_guild_permissions(hikari.Permissions.ADMINISTRATOR))
@@ -242,6 +243,8 @@ async def edit_card_id_command(ctx: lightbulb.Context) -> None:
     Database.execute(' UPDATE user_profile SET fav = ? WHERE fav = ? ', ctx.options.new_card_id, ctx.options.card_id)
     card_object = Card(ctx.options.new_card_id)
     card_object.get_card_data()
+    idx = inventory_list.index(ctx.options.card_id)
+    inventory_list[idx] = ctx.options.new_card_id
     embed = hikari.Embed(
         description=f"{ctx.author.mention} has edited \n ```\n{ctx.options.card_id}\n```\n\n"
                     f"Group: **{card_object.group}**\n"
@@ -290,6 +293,7 @@ async def add_card_command(ctx: lightbulb.Context) -> None:
             "Card unique ID already exists. Please use a different ID or change the existing ID to another ID.",
             flags=hikari.MessageFlag.EPHEMERAL)
 
+    inventory_list.append(ctx.options.card_id)
     card_object = Card(ctx.options.card_id)
     card_object.get_card_data()
     embed = hikari.Embed(

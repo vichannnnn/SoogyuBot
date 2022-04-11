@@ -7,13 +7,14 @@ import asyncio
 plugin = lightbulb.Plugin("Display Handler")
 
 class Pages(miru.View):
-    def __init__(self, n, data):
+    def __init__(self, n, data, member: hikari.Member):
         super().__init__(timeout=60)
         self.value = 1
         self.data = data
         self.current_page = None
         self.n = n
         self.pages = math.ceil(len(self.data) / n)
+        self.member = member
 
     async def view_check(self, ctx: miru.Context) -> bool:
         # user who interacted with button == user who invoked command
@@ -30,8 +31,8 @@ class Pages(miru.View):
             description += f'`{id}`|**{int(rarity) * "⭐"} {name}** ({theme}) - {quantity:,}\n'
 
         embed = hikari.Embed(description=description)
-        embed.set_author(name=f"Inventory - {ctx.user}", url=str(ctx.user.display_avatar_url))
-        embed.set_thumbnail(str(ctx.user.display_avatar_url))
+        embed.set_author(name=f"Inventory - {self.member}", url=str(self.member.display_avatar_url))
+        embed.set_thumbnail(str(self.member.display_avatar_url))
         embed.set_footer(text=f"Page {self.value} of {self.pages}")
 
         if self.value <= 1:
@@ -59,8 +60,8 @@ class Pages(miru.View):
             description += f'`{id}`|**{int(rarity) * "⭐"} {name}** ({theme}) - {quantity:,}\n'
 
         embed = hikari.Embed(description=description)
-        embed.set_author(name=f"Inventory - {ctx.user}", url=str(ctx.user.display_avatar_url))
-        embed.set_thumbnail(str(ctx.user.display_avatar_url))
+        embed.set_author(name=f"Inventory - {self.member}", url=str(self.member.display_avatar_url))
+        embed.set_thumbnail(str(self.member.display_avatar_url))
         embed.set_footer(text=f"Page {self.value} of {self.pages}")
 
         if self.value <= 1:

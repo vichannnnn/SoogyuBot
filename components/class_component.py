@@ -28,7 +28,7 @@ inventory_list = __Inventory(inv_list).list
 
 def profile_create(user: hikari.Member):
     try:
-        Database.execute('INSERT INTO user_profile (user_id) VALUES (?) ', user.id, )
+        Database.execute('INSERT INTO user_profile (user_id) VALUES (?) ', user.id)
         print(f"Created profile for User {user} ({user.id})")
         for card_id in inv_list:
             Database.execute('INSERT INTO inventory (user_id, card_id) VALUES (?, ?) ', user.id, card_id)
@@ -235,10 +235,10 @@ class Card:
     retired: int = None
 
     def unretire_card(self):
-        Database.execute('UPDATE cards SET retired = ? WHERE card_id = ? ', 0, self.card_id)
+        Database.execute('UPDATE cards SET card_retired = ? WHERE card_id = ? ', 0, self.card_id)
 
     def retire_card(self):
-        Database.execute('UPDATE cards SET retired = ? WHERE card_id = ? ', 1, self.card_id)
+        Database.execute('UPDATE cards SET card_retired = ? WHERE card_id = ? ', 1, self.card_id)
 
     def get_card_data(self):
         data = [i for i in Database.get('SELECT * FROM cards WHERE card_id = ? ', self.card_id)]

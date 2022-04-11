@@ -37,7 +37,7 @@ def dmyConverter(seconds):
 
 
 @plugin.command()
-@lightbulb.option("biography", "The biography text that you want to set.", str)
+@lightbulb.option("biography", "The biography text that you want to set.", str, modifier=lightbulb.OptionModifier.CONSUME_REST)
 @lightbulb.command("setbio", "You can set your biography for your user profile.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def set_biography_command(ctx: lightbulb.Context) -> None:
@@ -53,16 +53,16 @@ async def set_biography_command(ctx: lightbulb.Context) -> None:
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def inventory_command(ctx: lightbulb.Context) -> None:
     if ctx.options.user:
-        target = ctx.get_guild().get_member(ctx.options.user).id
+        target = ctx.get_guild().get_member(ctx.options.user)
     else:
-        target = ctx.author.id
+        target = ctx.member
 
-    inventory_object = Inventory(target)
+    inventory_object = Inventory(target.id)
     group_data = inventory_object.get_group_owned(ctx.options.group)
 
     if not group_data:
         return await ctx.respond(
-            f"{ctx.author.mention}, you do not have any cards belonging to **{ctx.options.group}**.")
+            f"{ctx.author.mention}, the user do not have any cards belonging to **{ctx.options.group}**.")
 
     description = ''
     i = 1
@@ -72,11 +72,11 @@ async def inventory_command(ctx: lightbulb.Context) -> None:
         description += f'`{id}`|**{int(rarity) * "⭐"} {name}** ({theme}) - {quantity:,}\n'
 
     embed = hikari.Embed(description=description)
-    embed.set_author(name=f"Inventory - {ctx.author}", url=str(ctx.author.display_avatar_url))
+    embed.set_author(name=f"Inventory - {target}", url=str(target.display_avatar_url))
     embed.set_footer(text=f"Page 1 of {math.ceil(len(group_data))}")
-    embed.set_thumbnail(str(ctx.author.display_avatar_url))
+    embed.set_thumbnail(str(target.display_avatar_url))
 
-    view = Pages(n, group_data)
+    view = Pages(n, group_data, target)
     proxy = await ctx.respond(embed=embed, components=view.build())
     message = await proxy.message()
     view.start(message)
